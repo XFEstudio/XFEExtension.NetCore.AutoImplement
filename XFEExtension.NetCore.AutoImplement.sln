@@ -3,12 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.11.34929.205
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XFEExtension.NetCore.AutoImplement", "XFEExtension.NetCore.AutoImplement\XFEExtension.NetCore.AutoImplement.csproj", "{E74B6938-9516-4211-88EB-5C68EB76FD62}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BECB5988-CA6E-471E-AFE8-C8416BC5A9B2} = {BECB5988-CA6E-471E-AFE8-C8416BC5A9B2}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XFEExtension.NetCore.AutoImplement.Analyzer", "XFEExtension.NetCore.AutoImplement.Analyzer\XFEExtension.NetCore.AutoImplement.Analyzer.csproj", "{BECB5988-CA6E-471E-AFE8-C8416BC5A9B2}"
 EndProject
 Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3C237470-3400-4B76-862D-63B1608FE3D8}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BECB5988-CA6E-471E-AFE8-C8416BC5A9B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BECB5988-CA6E-471E-AFE8-C8416BC5A9B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BECB5988-CA6E-471E-AFE8-C8416BC5A9B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BECB5988-CA6E-471E-AFE8-C8416BC5A9B2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E74B6938-9516-4211-88EB-5C68EB76FD62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E74B6938-9516-4211-88EB-5C68EB76FD62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E74B6938-9516-4211-88EB-5C68EB76FD62}.Release|Any CPU.ActiveCfg = Release|Any CPU
