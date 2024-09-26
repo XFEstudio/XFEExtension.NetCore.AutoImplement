@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
     <Title>AutoImplement</Title>
     <Authors>XFEstudio</Authors>
     <Company>寰宇朽力网络科技有限公司</Company>
@@ -15,7 +16,8 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension.NetCore.AutoImplement.git</RepositoryUrl>
     <PackageTags>XFE;impl;implement;auto</PackageTags>
-    <PackageReleaseNotes>First Release</PackageReleaseNotes>
+    <PackageReleaseNotes>修复了不能实现泛型类的bug
+修复了泛型类无法继承泛型约束条件的bug</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
