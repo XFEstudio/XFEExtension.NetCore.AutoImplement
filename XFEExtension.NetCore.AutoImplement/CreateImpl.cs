@@ -8,13 +8,13 @@ public class CreateImpl : Attribute
 {
     public string? ClassName { get; set; }
     public string? NameSpace { get; set; }
-    public string? Modifier { get; set; }
+    public string[]? Modifier { get; set; }
     public CreateImpl() { }
     public CreateImpl(string className)
     {
         ClassName = className;
     }
-    public CreateImpl(string className, string modifier)
+    public CreateImpl(string className, params string[] modifier)
     {
         ClassName = className;
         Modifier = modifier;

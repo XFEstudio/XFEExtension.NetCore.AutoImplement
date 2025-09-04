@@ -6,15 +6,16 @@ using System.Linq;
 namespace XFEExtension.NetCore.AutoImplement.Analyzer.Generator
 {
     [Generator]
-    public class ImplementAutoGenerator : ISourceGenerator
+    public class ImplementAutoGenerator : IIncrementalGenerator
     {
-        public void Initialize(GeneratorInitializationContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
+            context.RegisterSourceOutput(context.CompilationProvider, Generate);
         }
 
-        public void Execute(GeneratorExecutionContext context)
+        public void Generate(SourceProductionContext context, Compilation compilation)
         {
-            var syntaxTrees = context.Compilation.SyntaxTrees;
+            var syntaxTrees = compilation.SyntaxTrees;
             foreach (var syntaxTree in syntaxTrees)
             {
                 var root = syntaxTree.GetRoot();
@@ -28,7 +29,7 @@ namespace XFEExtension.NetCore.AutoImplement.Analyzer.Generator
                 foreach (var classDeclaration in classDeclarations)
                 {
                     var className = classDeclaration.Identifier.ValueText;
-                    var implementationSyntaxTree = GenerateImplementationSyntaxTree(classDeclaration, usingDirectives, fileScopedNamespaceDeclarationSyntax);
+                    var implementationSyntaxTree = GenerateImplementationSyntaxTree(classDeclaration, usingDirectives, fileScopedNamespaceDeclarationSyntax, className);
                     context.AddSource($"{className}Impl.g.cs", implementationSyntaxTree.ToString());
                 }
             }
@@ -36,24 +37,25 @@ namespace XFEExtension.NetCore.AutoImplement.Analyzer.Generator
 
         private static bool IsCreateImplAttribute(AttributeListSyntax attributeList) => attributeList.Attributes.Any(attribute => attribute.Name.ToString() == "CreateImpl");
 
-        private static SyntaxTree GenerateImplementationSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax)
+        private static SyntaxTree GenerateImplementationSyntaxTree(ClassDeclarationSyntax classDeclaration, UsingDirectiveSyntax[] usingDirectiveSyntaxes, FileScopedNamespaceDeclarationSyntax fileScopedNamespaceDeclarationSyntax, string className, string[] modifierParameters, string nameSpace)
         {
-            var className = classDeclaration.Identifier.ValueText;
+            var fatherClassName = classDeclaration.Identifier.ValueText;
+            var modifiers = modifierParameters.Select(modifier => SyntaxFactory.ParseToken(modifier)).ToArray();
             ClassDeclarationSyntax implementationClass;
             if (classDeclaration.ParameterList is null)
             {
-                implementationClass = SyntaxFactory.ClassDeclaration($"{className}Impl")
-                    .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword), SyntaxFactory.Token(SyntaxKind.SealedKeyword))
+                implementationClass = SyntaxFactory.ClassDeclaration(className)
+                    .AddModifiers(modifiers)
                     .AddMembers(classDeclaration.Members.OfType<ConstructorDeclarationSyntax>().Select(constructor =>
                     {
-                        return SyntaxFactory.ConstructorDeclaration($"{className}Impl")
+                        return SyntaxFactory.ConstructorDeclaration(className)
                                             .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword))
                                             .WithBody(SyntaxFactory.Block())
                                             .WithParameterList(constructor.ParameterList)
                                             .WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer, SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(constructor.ParameterList.Parameters.Select(parameter => SyntaxFactory.Argument(SyntaxFactory.IdentifierName(parameter.Identifier)))))));
                     }).ToArray())
                     .WithLeadingTrivia(SyntaxFactory.ParseLeadingTrivia($@"/// <summary>
-/// <seealso cref=""{className}Impl""/> 是根据 <seealso cref=""{className}""/> 自动生成的实现类
+/// <seealso cref=""{className}""/> 是根据 <seealso cref=""{fatherClassName}""/> 自动生成的实现类
 /// </summary>
 "))
                     .NormalizeWhitespace();
@@ -61,7 +63,7 @@ namespace XFEExtension.NetCore.AutoImplement.Analyzer.Generator
             else
             {
                 implementationClass = SyntaxFactory.ClassDeclaration($"{className}Impl")
-                    .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword))
+                    .AddModifiers(modifiers)
                     .AddMembers(SyntaxFactory.ConstructorDeclaration($"{className}Impl")
                                              .AddModifiers(SyntaxFactory.Token(SyntaxKind.InternalKeyword))
                                              .WithBody(SyntaxFactory.Block())
