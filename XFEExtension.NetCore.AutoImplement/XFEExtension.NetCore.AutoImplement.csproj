@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <Title>AutoImplement</Title>
     <Authors>XFEstudio</Authors>
     <Company>寰宇朽力网络科技有限公司</Company>
@@ -16,8 +16,10 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/XFEstudio/XFEExtension.NetCore.AutoImplement.git</RepositoryUrl>
     <PackageTags>XFE;impl;implement;auto</PackageTags>
-    <PackageReleaseNotes>修复了不能实现泛型类的bug
-修复了泛型类无法继承泛型约束条件的bug</PackageReleaseNotes>
+    <PackageReleaseNotes>
+      现在，可以通过在CreateImpl特性的传参中设置属性来实现自定义实现类的类名、命名空间及可访问性修饰符
+      且现在的实现类默认使用`internal`和`partial`修饰符，可以更加方便的修改实现类中的内容
+    </PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
