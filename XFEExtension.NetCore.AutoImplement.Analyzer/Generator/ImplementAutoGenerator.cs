@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -13,15 +14,17 @@ public class ImplementAutoGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        //var implementationProvider = context.SyntaxProvider.ForAttributeWithMetadataName("CreateImpl",
+        //static (x, _) => x is ClassDeclarationSyntax classDeclaration && classDeclaration.AttributeLists.Any(IsCreateImplAttribute),
+        //GetCreateImpl);
         var implementationProvider = context.SyntaxProvider.ForAttributeWithMetadataName("CreateImpl",
-                                                                                         static (x, _) => x is ClassDeclarationSyntax classDeclaration && classDeclaration.AttributeLists.Any(IsCreateImplAttribute),
+                                                                                         static (x, _) => x is ClassDeclarationSyntax classDeclaration,
                                                                                          GetCreateImpl);
         context.RegisterSourceOutput(implementationProvider.Combine(context.CompilationProvider), Generate);
     }
 
     public void Generate(SourceProductionContext context, (ImplementationInfo? ImplementationInfo, Compilation Compilation) args)
     {
-        Debugger.Launch();
         if (args.ImplementationInfo is null)
             return;
         var root = args.ImplementationInfo.ClassDeclaration.SyntaxTree.GetRoot();
@@ -40,7 +43,8 @@ public class ImplementAutoGenerator : IIncrementalGenerator
 
     public static ImplementationInfo? GetCreateImpl(GeneratorAttributeSyntaxContext context, CancellationToken token)
     {
-        Debugger.Launch();
+        if (context is { TargetSymbol: INamedTypeSymbol } && context.Attributes.First().ConstructorArguments.Length > 0)
+            Debugger.Launch();
         token.ThrowIfCancellationRequested();
         var classDeclaration = (ClassDeclarationSyntax)context.TargetNode;
         var attributeData = context.Attributes.FirstOrDefault(ad => ad.AttributeClass?.ToDisplayString() == "CreateImpl");
@@ -48,8 +52,24 @@ public class ImplementAutoGenerator : IIncrementalGenerator
             return null;
         var className = classDeclaration.Identifier.ValueText;
         var targetClassName = attributeData.NamedArguments.FirstOrDefault(kv => kv.Key == "ClassName").Value.Value as string ?? $"{className}Impl";
+        //var targetClassName = $"{className}Impl";
         var nameSpace = attributeData.NamedArguments.FirstOrDefault(kv => kv.Key == "NameSpace").Value.Value as string ?? string.Empty;
-        var modifiers = attributeData.NamedArguments.FirstOrDefault(kv => kv.Key == "Modifiers").Value.Values.Select(v => v.Value?.ToString() ?? string.Empty).Where(s => !string.IsNullOrEmpty(s)).ToArray() ?? [];//此处出现问题
+        //var nameSpace = string.Empty;
+        //var value = attributeData.NamedArguments.FirstOrDefault(kv => kv.Key == "Modifiers").Value;
+        //var modifiers = attributeData.NamedArguments.FirstOrDefault(kv => kv.Key == "Modifiers").Value.Values.Select(v => v.Value?.ToString() ?? string.Empty).Where(s => !string.IsNullOrEmpty(s)).ToArray() ?? [];
+        var modifiers = Array.Empty<string>();
+        //foreach (var attributeList in classDeclaration.AttributeLists)
+        //{
+        //    foreach (var attribute in attributeList.Attributes)
+        //    {
+        //        if (attribute is null || attribute.Name.ToString() != "CreateImpl")
+        //            continue;
+        //        foreach (var argument in attribute.ArgumentList.Arguments)
+        //        {
+
+        //        }
+        //    }
+        //}
         if (modifiers.Length == 0)
             modifiers = ["internal", "partial"];
         return new ImplementationInfo
